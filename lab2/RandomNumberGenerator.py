@@ -28,17 +28,20 @@ class RandomNumberGenerator:
         return val
 
 
-def calculate(rj, pj, qj, tasks):
+def calculate(rj, pj, qj, task_number):
     Sj = []
     Cj = []
+    Cjq = []
     Sj.append(max(rj[0], 0))
     Cj.append(Sj[0]+pj[0])
-    Cmax = Cj[0] + qj[0]
-    for task in tasks[:-1]:
-        Sj.append(max(rj[task], Cj[task-1]))
-        Cj.append(Sj[task] + pj[task])
-        Cmax = max(Cmax, Cj[task] + qj[task])
-    return [[Sj, Cj], Cmax]
+    Cjq.append(Cj[0] + qj[0])
+    Cmax = Cjq[0]
+    for j in range(1, task_number):
+        Sj.append(max(rj[j], Cj[j-1]))
+        Cj.append(Sj[j] + pj[j])
+        Cjq.append(Cj[j] + qj[j])
+        Cmax = max(Cmax, Cjq[j])
+    return [[Sj, Cj, Cjq], Cmax]
 
 
 def Schrage(tasks, rj, pj, qj):
@@ -46,18 +49,20 @@ def Schrage(tasks, rj, pj, qj):
     G = []
     tasks = list(tasks)
     N = tasks
+    tasks = []
     t = min(rj)
     while (len(G)) or (len(N)):
         while (len(N)) and (min(rj) <= t):
-            j_ = rj.index(min(rj)) +1
-            print(j_)
-            G.append(j_)
-            N.remove(j_)
+            j_ = rj.index(min(rj))
+            rj[j_] = 99999999999
+            G.append(j_ + 1)
+            N.remove(j_ + 1)
         if len(G):
-            j_ = rj.index(max(qj)) +1
+            j_ = qj.index(max([qj[i - 1] for i in G])) + 1
+            qj[j_ - 1]= - 99999999999
             G.remove(j_) 
-            tasks[k] = j_
-            t += p[j_]
+            tasks.append(j_)
+            t += pj[j_ - 1]
             k += 1
         else:
             t = min(rj)
@@ -86,24 +91,26 @@ def main():
     for _ in tasks:
         rj.append(generator.nextInt(1, sum))
 
-    X = 29 # test
-#    X = sum # not test
+#    X = 29 # test
+    X = sum # not test
     for _ in tasks:
         qj.append(generator.nextInt(1, X))
     
     print("\nnr: {} \nRj: {} \nPj: {} \nQj: {}".format(pi, rj, pj, qj))
-    [[Sj, Cj], Cmax] = calculate(rj, pj, qj, tasks)
-    print("\npi: {} \nS: {} \nC: {}".format(pi, Sj, Cj))
+    [[Sj, Cj, Cjq], Cmax] = calculate(rj, pj, qj, task_number)
+    print("\npi: {} \nS: {} \nC: {} \nCq: {}".format(pi, Sj, Cj, Cjq))
+    print("Cmax: {}".format(Cmax))
 
     for task in tasks:
         Tab.append([pi[task-1], rj[task-1], pj[task-1], qj[task-1]])
-    #Tab.sort(key=lambda x: (x[1]))
 
-    tasks = Schrage(tasks, rj, pj, qj)
+    pi = Schrage(tasks, rj, pj, qj)
+    sort = {x: i for i, x in enumerate(pi)}
+    Tab.sort(key = lambda x: sort[x[0]])
 
-    [[Sj, Cj], Cmax] = calculate([row[1] for row in Tab], [row[2] for row in Tab], [row[3] for row in Tab], tasks)
-    print("\npi: {} \nS: {} \nC: {}".format(tasks, Sj, Cj))
-    print("\nCmax: {}".format(Cmax))
+    [[Sj, Cj, Cjq], Cmax] = calculate([row[1] for row in Tab], [row[2] for row in Tab], [row[3] for row in Tab], task_number)
+    print("\npi: {} \nS: {} \nC: {} \nCq: {}".format(pi, Sj, Cj, Cjq))
+    print("Cmax: {}".format(Cmax))
 
 if __name__ == "__main__":
     main()
