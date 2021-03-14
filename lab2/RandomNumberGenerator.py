@@ -33,7 +33,7 @@ def calculate(rj, pj, qj, task_number):
     Cj = []
     Cjq = []
     Sj.append(max(rj[0], 0))
-    Cj.append(Sj[0]+pj[0])
+    Cj.append(Sj[0] + pj[0])
     Cjq.append(Cj[0] + qj[0])
     Cmax = Cjq[0]
     for j in range(1, task_number):
@@ -53,46 +53,41 @@ def Schrage(tasks, rj, pj, qj):
     t = min(rj)
     while (len(G)) or (len(N)):
         while (len(N)) and (min(rj) <= t):
-            j_ = rj.index(min(rj))
-            rj[j_] = 99999999999
-            G.append(j_ + 1)
-            N.remove(j_ + 1)
+            j = rj.index(min(rj))
+            rj[j] = 99999999999
+            G.append(j + 1)
+            N.remove(j + 1)
         if len(G):
-            j_ = qj.index(max([qj[i - 1] for i in G])) + 1
-            qj[j_ - 1]= - 99999999999
-            G.remove(j_) 
-            tasks.append(j_)
-            t += pj[j_ - 1]
+            j = qj.index(max([qj[i - 1] for i in G])) + 1
+            qj[j - 1]= - 99999999999
+            G.remove(j) 
+            tasks.append(j)
+            t += pj[j - 1]
             k += 1
         else:
             t = min(rj)
     return tasks
+
 
 def main():
     seed = int(input("Enter Z number: "))
     generator = RandomNumberGenerator(seed)
     task_number = int(input("Enter tasks number: "))
     tasks = range(1, task_number + 1)
-    rj = []
-    pj = []
-    qj = []
-    pi = []
-    Tab = []
+    rj, pj, qj, pi, Tab = [], [], [], [], []
 
     for task in tasks:
         pj.append(generator.nextInt(1, 29))
         pi.append(task)
 
     sum = 0
-
     for num in pj:
         sum += num
 
     for _ in tasks:
         rj.append(generator.nextInt(1, sum))
 
-#    X = 29 # test
-    X = sum # not test
+    X = sum 
     for _ in tasks:
         qj.append(generator.nextInt(1, X))
     
@@ -111,6 +106,7 @@ def main():
     [[Sj, Cj, Cjq], Cmax] = calculate([row[1] for row in Tab], [row[2] for row in Tab], [row[3] for row in Tab], task_number)
     print("\npi: {} \nS: {} \nC: {} \nCq: {}".format(pi, Sj, Cj, Cjq))
     print("Cmax: {}".format(Cmax))
+
 
 if __name__ == "__main__":
     main()
