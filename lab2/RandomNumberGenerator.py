@@ -76,27 +76,28 @@ def Schrage_ptmn(tasks, rj, pj, qj):
     Nn = tasks
     tasks = []
     l = 0 
-    q0 = 99999999999
-    t = 0
+    qj[0] = 99999999999
+    t = min(rj)
     Cmax = 0
     while (len(Ng)) or (len(Nn)):
         while (len(Nn)) and (min(rj) <= t):
             j = rj.index(min(rj))
-            rj[j] = 99999999999
             Ng.append(j + 1)
             Nn.remove(j + 1)
-            if qj[j+1] > qj[l]:
-                pj[l] = t - rj[j+1]
-                t = rj[j+1]
+            if qj[j-1] > qj[l]:
+                pj[l] = t - rj[j-1]
+                t = rj[j-1]
                 if pj[l] > 0:
-                    Ng.append(j + 1)            
+                    Ng.append(j + 1)  
+            rj[j] = 99999999999          
         if len(Ng):
             j = qj.index(max([qj[i - 1] for i in Ng])) + 1
-            qj[j - 1] = - 99999999999
             Ng.remove(j)
+            tasks.append(j)
             l = j # +1 ??
             t += pj[j - 1]
             Cmax = max(Cmax, t + qj[j - 1])
+            qj[j - 1] = - 99999999999
         else:
             t = min(rj)
     return tasks
@@ -142,6 +143,9 @@ def main():
     print("Cmax: {}".format(Cmax))
 
     print("\n\n ____________ \n")
+    rj = [row[1] for row in Tab]
+    pj = [row[2] for row in Tab]
+    qj = [row[3] for row in Tab]
     pi = Schrage_ptmn(tasks, rj, pj, qj)
     sort = {x: i for i, x in enumerate(pi)}
     Tab.sort(key = lambda x: sort[x[0]])
