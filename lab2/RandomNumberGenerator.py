@@ -96,12 +96,10 @@ def Schrage_ptmn(tasks, rj, pj, qj):
             tasks.append(j)
             l = j # +1 ??
             t += pj[j - 1]
-            print(qj[j - 1])
             Cmax = max(Cmax, t + qj[j - 1])
             qj[j - 1] = - 99999999999
         else:
             t = min(rj)
-    print(Cmax)
     return tasks
 
 
@@ -149,7 +147,6 @@ def main():
     pj = [row[2] for row in Tab]
     qj = [row[3] for row in Tab]
     pi = Schrage_ptmn(tasks, rj, pj, qj)
-    print(pi)
     sort = {x: i for i, x in enumerate(pi)}
     Tab.sort(key = lambda x: sort[x[0]])
 
