@@ -1,5 +1,5 @@
 import math
-
+import time
 
 class RandomNumberGenerator:
 
@@ -33,14 +33,13 @@ class RandomNumberGenerator:
 def calculate(pj, task_number, machine_number):
     Sj = []
     Cj = []
-    Cjq = []
     S = []
     C = []
 
 
     S.append(0)            
     C.append(S[0]+pj[0][0])
-    S.append(max(0,C[0]))
+    S.append(max(C[0], 0))
     C.append(S[1]+pj[0][1])
     for m in range(2, machine_number):
         S.append(max(C[m-1],0))
@@ -58,8 +57,33 @@ def calculate(pj, task_number, machine_number):
         Sj.append(S.copy());    S.clear()
         Cj.append(C.copy());    C.clear()
         Cmax = max(Cmax, Cj[j][machine_number-1])
-    return [[Sj, Cj, Cjq], Cmax]
+    return [[Sj, Cj], Cmax]
 
+
+def findmin(pj):
+    values, idx2 = [], []
+    for idx1 in range(len(pj)):
+        values.append(min(pj[idx1]))
+        idx2.append(pj[idx1].index(values[-1]))
+    idx1 = values.index(min(values))
+    return idx1, idx2[idx1]
+
+def Johnson2(tasks, pj):
+    l = 0
+    k = len(tasks) - 1
+    tasks = list(tasks)
+    N = tasks.copy()
+    while (len(N)):
+        j, i = findmin(pj)
+        if pj[j][0] < pj[j][1]:
+            tasks[l] = j + 1
+            l += 1
+        else:
+            tasks[k] = j + 1
+            k -= 1 
+        N.remove(j + 1)
+        pj[j] = [9999999999,9999999999] # pj.remove(pj[j]) psuje findmin
+    return tasks
 
 def main():
     seed = int(input("Enter Z number: "))
@@ -68,7 +92,7 @@ def main():
     tasks = range(1, task_number + 1)
     machine_number = int(input("Enter machines number: "))
     machines = range(1, machine_number + 1)
-    rj, pj, qj, pi, Tab = [], [], [], [], []
+    pj, pi, Tab = [], [], []
     p = []
 
     for task in tasks:
@@ -80,44 +104,21 @@ def main():
 
     print(pj)
 
-    [[Sj, Cj, Cjq], Cmax] = calculate(pj, task_number, machine_number)
+    [[Sj, Cj], Cmax] = calculate(pj, task_number, machine_number)
 
     print("\nnr: {} \nCj: {} \nCmax: {}".format(pi, Cj, Cmax))
 
+    for task in tasks:
+        Tab.append([pi[task-1], pj[task-1]])
 
-
-    # sum = 0
-    # for num in pj:
-    #     sum += num
-
-    # print("\nnr: {} \nRj: {} \nPj: {} \nQj: {}".format(pi, rj, pj, qj))
-    # [[Sj, Cj, Cjq], Cmax] = calculate(rj, pj, qj, task_number)
-    # print("\npi: {} \nS: {} \nC: {} \nCq: {}".format(pi, Sj, Cj, Cjq))
-    # print("Cmax: {}".format(Cmax))
-
-    # for task in tasks:
-    #     Tab.append([pi[task-1], rj[task-1], pj[task-1], qj[task-1]])
-
-    # pi = Schrage(tasks, rj, pj, qj)
-    # sort = {x: i for i, x in enumerate(pi)}
-    # Tab.sort(key = lambda x: sort[x[0]])
-
-    # [[Sj, Cj, Cjq], Cmax] = calculate([row[1] for row in Tab], [row[2] for row in Tab], [row[3] for row in Tab], task_number)
-    # print("\npi: {} \nS: {} \nC: {} \nCq: {}".format(pi, Sj, Cj, Cjq))
-    # print("Cmax: {}".format(Cmax))
-
-    # print("\n\n ____________ \n")
-    # tasks = [row[0] for row in Tab]
-    # rj = [row[1] for row in Tab]
-    # pj = [row[2] for row in Tab]
-    # qj = [row[3] for row in Tab]
-    # pi = Schrage_ptmn(tasks, rj, pj, qj)
-    # sort = {x: i for i, x in enumerate(pi)}
-    # Tab.sort(key = lambda x: sort[x[0]])
-
-    # [[Sj, Cj, Cjq], Cmax] = calculate([row[1] for row in Tab], [row[2] for row in Tab], [row[3] for row in Tab], task_number)
-    # print("\npi: {} \nS: {} \nC: {} \nCq: {}".format(pi, Sj, Cj, Cjq))
-    # print("Cmax: {}".format(Cmax))
+    start = time.time()
+    pi = Johnson2(tasks, pj.copy())
+    total = time.time() - start
+    sort = {x: i for i, x in enumerate(pi)}
+    Tab.sort(key = lambda x: sort[x[0]])
+    [[Sj, Cj], Cmax] = calculate([row[1] for row in Tab], task_number, machine_number)
+    print("\nJohnson \nnr: {} \nCj: {} \nCmax: {}".format(pi, Cj, Cmax))
+    print("czas działania: {0:02f} s".format(total))
 
 
 
