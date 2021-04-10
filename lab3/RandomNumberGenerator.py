@@ -30,7 +30,7 @@ class RandomNumberGenerator:
 
 
 
-def calculate(pj, task_number, machine):
+def calculate(pj, task_number, machine_number):
     Sj = []
     Cj = []
     Cjq = []
@@ -38,27 +38,26 @@ def calculate(pj, task_number, machine):
     C = []
 
 
-    S.append(0)
+    S.append(0)            
     C.append(S[0]+pj[0][0])
     S.append(max(0,C[0]))
     C.append(S[1]+pj[0][1])
-    Sj.append(S.copy())
-    S.clear()    
-    Cj.append(C.copy())
-    C.clear()
+    for m in range(2, machine_number):
+        S.append(max(C[m-1],0))
+        C.append(S[m]+pj[0][m])
+    Sj.append(S.copy());    S.clear()    
+    Cj.append(C.copy());    C.clear()
     Cmax = Cj[0][1]
 
     for j in range(1, task_number):
         S.append(max(0,Cj[j-1][0]))
         C.append(S[0]+pj[j][0])
-        for m in range(1, machine):
+        for m in range(1, machine_number):
             S.append(max(C[m-1],Cj[j-1][m]))
             C.append(S[m]+pj[j][m])
-        Sj.append(S.copy())
-        S.clear()
-        Cj.append(C.copy())
-        C.clear()
-        Cmax = max(Cmax, Cj[j][machine-1])
+        Sj.append(S.copy());    S.clear()
+        Cj.append(C.copy());    C.clear()
+        Cmax = max(Cmax, Cj[j][machine_number-1])
     return [[Sj, Cj, Cjq], Cmax]
 
 
@@ -67,12 +66,13 @@ def main():
     generator = RandomNumberGenerator(seed)
     task_number = int(input("Enter tasks number: "))
     tasks = range(1, task_number + 1)
-    machine = 2
+    machine_number = int(input("Enter machines number: "))
+    machines = range(1, machine_number + 1)
     rj, pj, qj, pi, Tab = [], [], [], [], []
     p = []
 
     for task in tasks:
-        for m in range(1,machine+1):
+        for m in machines:
             p.append(generator.nextInt(1, 29))
         pj.append(p.copy())
         p.clear()
@@ -80,7 +80,7 @@ def main():
 
     print(pj)
 
-    [[Sj, Cj, Cjq], Cmax] = calculate(pj, task_number, machine)
+    [[Sj, Cj, Cjq], Cmax] = calculate(pj, task_number, machine_number)
 
     print("\nnr: {} \nCj: {} \nCmax: {}".format(pi, Cj, Cmax))
 
