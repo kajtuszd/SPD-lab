@@ -1,5 +1,10 @@
 import math
 import time
+import numpy as np
+
+task_number = 0
+machine_number = 0
+pj = []
 
 class RandomNumberGenerator:
 
@@ -71,7 +76,6 @@ def findmin(pj):
 def Johnson2(tasks, pj):
     l = 0
     k = len(tasks) - 1
-    tasks = list(tasks)
     N = tasks.copy()
     while (len(N)):
         j, i = findmin(pj)
@@ -85,6 +89,39 @@ def Johnson2(tasks, pj):
         pj[j] = [9999999999,9999999999] # pj.remove(pj[j]) psuje findmin
     return tasks
 
+def Bound(pi, N):
+    global pj
+    v = []
+    pj = np.array(pj)
+    (x, y) = pj.shape
+    print(x,y)
+    for i in range(x):
+        sum = 0
+        for j in range(y):
+            sum+=pj[i,j]
+        v.append(C[i]+sum)
+    return max(v)
+
+
+
+def BnB(task, N, pi, UB):
+    # l = 0
+    # k = len(tasks) - 1
+    pi.append(task)
+    N.remove(task + 1)
+    if len(N):
+        LB = Bound(pi, N)
+        if LB < UB:
+            for j in N:
+                BnB(j, N, pi)
+    else:
+        Cmax = calculate(pj, task_number, machine_number)
+        if Cmax < UB:
+            UB = Cmax
+            pi_ = pi
+
+
+
 def main():
     seed = int(input("Enter Z number: "))
     generator = RandomNumberGenerator(seed)
@@ -92,7 +129,8 @@ def main():
     tasks = range(1, task_number + 1)
     machine_number = int(input("Enter machines number: "))
     machines = range(1, machine_number + 1)
-    pj, pi, Tab = [], [], []
+    global pj
+    pi, Tab = [], []
     p = []
 
     for task in tasks:
@@ -111,6 +149,7 @@ def main():
     for task in tasks:
         Tab.append([pi[task-1], pj[task-1]])
 
+    tasks = list(tasks)
     start = time.time()
     pi = Johnson2(tasks, pj.copy())
     total = time.time() - start
@@ -120,7 +159,11 @@ def main():
     print("\nJohnson \nnr: {} \nCj: {} \nCmax: {}".format(pi, Cj, Cmax))
     print("czas działania: {0:02f} s".format(total))
 
-
+    N = tasks.copy()
+    UB = 99999999999
+    for task in N:
+        BnB(task, N, [], UB)
+    
 
 if __name__ == "__main__":
     main()
