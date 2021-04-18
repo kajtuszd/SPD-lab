@@ -28,35 +28,28 @@ class RandomNumberGenerator:
         return val
 
 
-
-
 def calculate(pj, task_number, machine_number):
-    Sj = []
-    Cj = []
-    S = []
-    C = []
-
-
-    S.append(0)            
-    C.append(S[0]+pj[0][0])
+    Sj, Cj, S, C = [], [], [], []
+    S.append(0)
+    C.append(S[0] + pj[0][0])
     S.append(max(C[0], 0))
-    C.append(S[1]+pj[0][1])
+    C.append(S[1] + pj[0][1])
     for m in range(2, machine_number):
-        S.append(max(C[m-1],0))
-        C.append(S[m]+pj[0][m])
-    Sj.append(S.copy());    S.clear()    
+        S.append(max(C[m - 1], 0))
+        C.append(S[m] + pj[0][m])
+    Sj.append(S.copy());    S.clear()
     Cj.append(C.copy());    C.clear()
     Cmax = Cj[0][1]
 
     for j in range(1, task_number):
-        S.append(max(0,Cj[j-1][0]))
-        C.append(S[0]+pj[j][0])
+        S.append(max(0, Cj[j - 1][0]))
+        C.append(S[0] + pj[j][0])
         for m in range(1, machine_number):
-            S.append(max(C[m-1],Cj[j-1][m]))
-            C.append(S[m]+pj[j][m])
+            S.append(max(C[m - 1], Cj[j - 1][m]))
+            C.append(S[m] + pj[j][m])
         Sj.append(S.copy());    S.clear()
         Cj.append(C.copy());    C.clear()
-        Cmax = max(Cmax, Cj[j][machine_number-1])
+        Cmax = max(Cmax, Cj[j][machine_number - 1])
     return [[Sj, Cj], Cmax]
 
 
@@ -68,22 +61,24 @@ def findmin(pj):
     idx1 = values.index(min(values))
     return idx1, idx2[idx1]
 
+
 def Johnson2(tasks, pj):
     l = 0
     k = len(tasks) - 1
     tasks = list(tasks)
     N = tasks.copy()
-    while (len(N)):
+    while len(N):
         j, i = findmin(pj)
         if pj[j][0] < pj[j][1]:
             tasks[l] = j + 1
             l += 1
         else:
             tasks[k] = j + 1
-            k -= 1 
+            k -= 1
         N.remove(j + 1)
-        pj[j] = [9999999999,9999999999] # pj.remove(pj[j]) psuje findmin
+        pj[j] = [9999999999, 9999999999] # pj.remove(pj[j]) psuje findmin
     return tasks
+
 
 def main():
     seed = int(input("Enter Z number: "))
@@ -92,11 +87,10 @@ def main():
     tasks = range(1, task_number + 1)
     machine_number = int(input("Enter machines number: "))
     machines = range(1, machine_number + 1)
-    pj, pi, Tab = [], [], []
-    p = []
+    pj, pi, Tab, p = [], [], [], []
 
     for task in tasks:
-        for m in machines:
+        for _ in machines:
             p.append(generator.nextInt(1, 29))
         pj.append(p.copy())
         p.clear()
@@ -118,8 +112,7 @@ def main():
     Tab.sort(key = lambda x: sort[x[0]])
     [[Sj, Cj], Cmax] = calculate([row[1] for row in Tab], task_number, machine_number)
     print("\nJohnson \nnr: {} \nCj: {} \nCmax: {}".format(pi, Cj, Cmax))
-    print("czas działania: {0:02f} s".format(total))
-
+    print("Working time: {0:02f} s".format(total))
 
 
 if __name__ == "__main__":
