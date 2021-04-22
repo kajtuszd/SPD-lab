@@ -5,6 +5,7 @@ import numpy as np
 task_number = 0
 machine_number = 0
 pj = []
+UB = 999999999999
 
 class RandomNumberGenerator:
 
@@ -40,8 +41,6 @@ def calculate(pj, task_number, machine_number):
     Cj = []
     S = []
     C = []
-
-
     S.append(0)            
     C.append(S[0]+pj[0][0])
     S.append(max(C[0], 0))
@@ -73,6 +72,7 @@ def findmin(pj):
     idx1 = values.index(min(values))
     return idx1, idx2[idx1]
 
+
 def Johnson2(tasks, pj):
     l = 0
     k = len(tasks) - 1
@@ -89,37 +89,54 @@ def Johnson2(tasks, pj):
         pj[j] = [9999999999,9999999999] # pj.remove(pj[j]) psuje findmin
     return tasks
 
+
+def sumColumn(matrix):
+    answer = []
+    for column in range(len(matrix[0])):
+        t = 0
+        for row in matrix:
+            t += row[column]
+        answer.append(t)
+    return answer
+
+
 def Bound(pi, N):
     global pj
     v = []
     pj = np.array(pj)
+    # print(pj)
+    C = sumColumn(pj)
     (x, y) = pj.shape
-    print(x,y)
+    # print(x,y)
     for i in range(x):
         sum = 0
         for j in range(y):
-            sum+=pj[i,j]
-        v.append(C[i]+sum)
+            sum += pj[i,j]
+        v.append(C[i] + sum)
     return max(v)
 
 
 
-def BnB(task, N, pi, UB):
-    # l = 0
-    # k = len(tasks) - 1
+def BnB(task, N, pi):
+    global UB
     pi.append(task)
-    N.remove(task + 1)
+    N.remove(task)
     if len(N):
-        LB = Bound(pi, N)
+        # LB = Bound(pi, N)
+        LB = 0
         if LB < UB:
             for j in N:
-                BnB(j, N, pi)
+                BnB(j, N.copy(), pi)
     else:
-        Cmax = calculate(pj, task_number, machine_number)
+        [[Sj, Cj], Cmax] = calculate(pj, task_number, machine_number)
+        print("+++++")
+        print(pi)
+        # print(Sj)
+        # print(Cj)
+        print("+++++")
         if Cmax < UB:
             UB = Cmax
             pi_ = pi
-
 
 
 def main():
@@ -151,7 +168,7 @@ def main():
 
     tasks = list(tasks)
     start = time.time()
-    pi = Johnson2(tasks, pj.copy())
+    pi = Johnson2(tasks.copy(), pj.copy())
     total = time.time() - start
     sort = {x: i for i, x in enumerate(pi)}
     Tab.sort(key = lambda x: sort[x[0]])
@@ -160,9 +177,13 @@ def main():
     print("czas działania: {0:02f} s".format(total))
 
     N = tasks.copy()
-    UB = 99999999999
+    # UB = 99999999999
     for task in N:
-        BnB(task, N, [], UB)
+        BnB(task, N.copy(), [])
+###########
+    print("\Bnb \nnr: {} \nCj: {} \nUB: {}".format(pi, Cj, UB))
+    print("czas działania: {0:02f} s".format(total))
+###########
     
 
 if __name__ == "__main__":
