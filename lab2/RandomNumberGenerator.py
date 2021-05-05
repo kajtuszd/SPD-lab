@@ -76,7 +76,8 @@ def Schrage_ptmn(tasks, rj, pj, qj):
     Nn = tasks
     tasks = []
     l = 0 
-    qj[0] = 99999999999
+    #qj[0] = 99999999999
+    qlast = 1
     t = min(rj)
     Cmax = 0
     while (len(Ng)) or (len(Nn)):
@@ -84,22 +85,27 @@ def Schrage_ptmn(tasks, rj, pj, qj):
             j = rj.index(min(rj))
             Ng.append(j + 1)
             Nn.remove(j + 1)
-            if qj[j-1] > qj[l]:
-                pj[l] = t - rj[j-1]
-                t = rj[j-1]
-                if pj[l] > 0:
-                    Ng.append(j + 1)  
+            if qj[j] > qlast:
+
+                pj[l-1] = t - rj[j]
+                t = rj[j]
+                if pj[l-1] > 0:
+                    Ng.append(l)  
             rj[j] = 99999999999          
         if len(Ng):
-            j = qj.index(max([qj[i - 1] for i in Ng])) + 1
+            j = qj.index(max([qj[i - 1] for i in Ng])) +1
+            print(Ng)
+            print(j)
             Ng.remove(j)
             tasks.append(j)
-            l = j # +1 ??
+            l = j 
             t += pj[j - 1]
             Cmax = max(Cmax, t + qj[j - 1])
+            qlast=qj[j-1]
             qj[j - 1] = - 99999999999
         else:
             t = min(rj)
+    print(Cmax)
     return tasks
 
 
@@ -143,6 +149,7 @@ def main():
     print("Cmax: {}".format(Cmax))
 
     print("\n\n ____________ \n")
+    tasks = [row[0] for row in Tab]
     rj = [row[1] for row in Tab]
     pj = [row[2] for row in Tab]
     qj = [row[3] for row in Tab]
