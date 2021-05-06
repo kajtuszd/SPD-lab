@@ -1,7 +1,7 @@
 import math
-import numpy as np
-import itertools
 import sys
+import itertools
+import numpy as np
 
 
 class RandomNumberGenerator:
@@ -32,22 +32,20 @@ class RandomNumberGenerator:
 
 
 def greedy(pj, wj, dj, tab):
-    calc = []
-    for index, elem in enumerate(tab):
-        calc.append([dj[index], tab[index], pj[index], wj[index]])
+    lst = []
+    for idx in tab:
+        lst.append([dj[idx - 1], tab[idx - 1], pj[idx - 1], wj[idx - 1]])
 
-    calc = sorted(calc, key=lambda x: x[0])
+    lst = sorted(lst, key=lambda x: x[0])
     pj, wj, dj, tab = [], [], [], []
-    for value in calc:
-        dj.append(value[0])
-        tab.append(value[1])
-        pj.append(value[2])
-        wj.append(value[3])
+    for val in lst:
+        dj.append(val[0])
+        tab.append(val[1])
+        pj.append(val[2])
+        wj.append(val[3])
 
     C, T, F, witi = calculate(pj, wj, dj, len(tab))
     print(f'\n pi: {tab}\n C: {C}\n T: {T}\n witi: {witi}\n F: {F}\n')
-    # print(f'\n\n Tab: {tab}\n pj: {pj}\n wj: {wj}\n dj: {dj}\n')
-
 
 
 def calculate(pj, wj, dj, tab):
@@ -56,18 +54,18 @@ def calculate(pj, wj, dj, tab):
     S.append(0)
     C.append(S[0] + pj[0])
 
-    for task in range(1, tab):
-        S.append(C[task - 1])
-        C.append(S[task] + pj[task])
+    for elem in range(1, tab):
+        S.append(C[elem - 1])
+        C.append(S[elem] + pj[elem])
 
-    for task in range(0, tab):
-        T.append(max(C[task] - dj[task], 0))
+    for elem in range(0, tab):
+        T.append(max(C[elem] - dj[elem], 0))
 
     F = 0
     witi = [None] * tab
-    for task in range(0, tab):
-        witi[task] = wj[task] * T[task]
-        F += witi[task]
+    for elem in range(0, tab):
+        witi[elem] = wj[elem] * T[elem]
+        F += witi[elem]
     return C, T, F, witi
 
 
@@ -90,9 +88,7 @@ def brute_force(pj, wj, dj, tab):
             witiopt= witi
             tab_iopt = tab_i
 
-    # C, T, F, witi = calculate(pj, wj, dj, tab)
     print(f'\n pi: {tab_iopt}\n C: {Copt}\n T: {Topt}\n witi: {witiopt}\n F: {res}\n')
-    # print(f'\n\n Tab: {tab}\n pj: {pj}\n wj: {wj}\n dj: {dj}\n')
     return res
 
 
@@ -101,9 +97,9 @@ def main():
     generator = RandomNumberGenerator(seed)
     task_number = int(input("Enter tasks number: "))
     tasks = range(1, task_number + 1)
-    
+
     tab, pj, wj, dj = [], [], [], []
-    
+
     for task in tasks:
         tab.append(task)
         pj.append(generator.nextInt(1, 29))
@@ -119,13 +115,12 @@ def main():
     C, T, target, witi = calculate(pj, wj, dj, task_number)
     print(f'\n pi: {tab}\n C: {C}\n T: {T}\n witi: {witi} \n F: {target}')
 
-    print("\ngreedy") 
+    print("\ngreedy")
     greedy(pj, wj, dj, tab)
 
     print("brute")
     brute_force(pj, wj, dj, tab)
-    # print(f'F={brute_force(pj, wj, dj, task_number)}')
+
 
 if __name__ == "__main__":
     main()
-
