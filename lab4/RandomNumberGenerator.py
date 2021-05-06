@@ -119,7 +119,7 @@ def main():
     C, T, target, witi = calculate(pj, wj, dj, task_number)
     print(f'\n pi: {tab}\n C: {C}\n T: {T}\n witi: {witi} \n F: {target}')
 
-    print("\ngreedy")
+    print("\ngreedy") 
     greedy(pj, wj, dj, tab)
 
     print("brute")
