@@ -45,8 +45,8 @@ def greedy(pj, wj, dj, tab):
         wj.append(value[3])
 
     C, T, F, witi = calculate(pj, wj, dj, len(tab))
-    print(f'\n C: {C}\n T: {T}\n F: {F}\n witi: {witi}\n')
-    print(f'\n\n Tab: {tab}\n pj: {pj}\n wj: {wj}\n dj: {dj}\n')
+    print(f'\n pi: {tab}\n C: {C}\n T: {T}\n witi: {witi}\n F: {F}\n')
+    # print(f'\n\n Tab: {tab}\n pj: {pj}\n wj: {wj}\n dj: {dj}\n')
 
 
 
@@ -72,22 +72,27 @@ def calculate(pj, wj, dj, tab):
 
 
 def brute_force(pj, wj, dj, tab):
-    perm = list(itertools.permutations(range(1, tab + 1)))
+    perm = list(itertools.permutations(range(1, len(tab) + 1)))
     res = sys.maxsize
 
     for i in range(len(perm)):
-        pj_i, wj_i, dj_i = [], [], []
+        pj_i, wj_i, dj_i, tab_i = [], [], [], []
         for j in range(len(perm[i])):
             pj_i.append(pj[perm[i][j] - 1])
             wj_i.append(wj[perm[i][j] - 1])
             dj_i.append(dj[perm[i][j] - 1])
+            tab_i.append(tab[perm[i][j] - 1])
         C, T, F, witi = calculate(pj_i, wj_i, dj_i, len(perm[i]))
         if F < res:
             res = F
+            Copt = C
+            Topt = T
+            witiopt= witi
+            tab_iopt = tab_i
 
-    C, T, F, witi = calculate(pj, wj, dj, tab)
-    print(f'\n C: {C}\n T: {T}\n F: {F}\n witi: {witi}\n')
-    print(f'\n\n Tab: {tab}\n pj: {pj}\n wj: {wj}\n dj: {dj}\n')
+    # C, T, F, witi = calculate(pj, wj, dj, tab)
+    print(f'\n pi: {tab_iopt}\n C: {Copt}\n T: {Topt}\n witi: {witiopt}\n F: {res}\n')
+    # print(f'\n\n Tab: {tab}\n pj: {pj}\n wj: {wj}\n dj: {dj}\n')
     return res
 
 
@@ -109,14 +114,17 @@ def main():
     for task in tasks:
         dj.append(generator.nextInt(1, 29))
 
-    print(f'\n\n Tab: {tab}\n pj: {pj}\n wj: {wj}\n dj: {dj}\n')
+    print(f'\n\n nr: {tab}\n pj: {pj}\n wj: {wj}\n dj: {dj}\n')
+    print("natural")
     C, T, target, witi = calculate(pj, wj, dj, task_number)
-    print(f'\n C: {C}\n T: {T}\n \n witi: {witi} \n target: {target}')
+    print(f'\n pi: {tab}\n C: {C}\n T: {T}\n witi: {witi} \n F: {target}')
 
-    print(f'F={brute_force(pj, wj, dj, task_number)}')
-
+    print("\ngreedy")
     greedy(pj, wj, dj, tab)
 
+    print("brute")
+    brute_force(pj, wj, dj, tab)
+    # print(f'F={brute_force(pj, wj, dj, task_number)}')
 
 if __name__ == "__main__":
     main()
